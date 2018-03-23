@@ -10,37 +10,37 @@ tags:
 description: 记录过程中出现的问题等
 ---
 
-# 1. 写在最前
+# 写在最前
 
 使用的是**Zorin OS**，基于Ubuntu的发行版。
 
-# 2. 环境准备
+# 环境准备
 
-## 2.1. 安装git
+## 安装git
 
 ```shell
 sudo apt-get install git
 ```
 
-## 2.2. 安装编译工具
+## 安装编译工具
 
 ```shell
 sudo apt-get install build-essential
 ```
 
-## 2.3. 安装CMake
+## 安装CMake
 
 ```shell
 sudo apt-get install cmake
 ```
 
-## 2.4. 安装ZLib
+## 安装ZLib
 
 ```shell
 sudo apt-get install zlib1g-dev
 ```
 
-## 2.5. 克隆为知笔记
+## 克隆为知笔记
 
 ```shell
 cd ~
@@ -67,7 +67,7 @@ src/sync/WizKMSync.cpp
 #include "WizKMSync.h"
 ```
 
-## 2.6. 安装Qt 5.7.0 for Linux 64-bit (715 MB) 或者更高版本
+## 安装Qt 5.7.0 for Linux 64-bit (715 MB) 或者更高版本
 
 ```shell
 wget http://download.qt.io/official_releases/qt/5.7/5.7.0/qt-opensource-linux-x64-5.7.0.run 
@@ -75,27 +75,27 @@ chmod +x qt-opensource-linux-x64-5.7.0.run
 ./qt-opensource-linux-x64-5.7.0.run
 ```
 
-# 3. 编译源代码
+# 编译源代码
 
 **运行QtCreator，菜单栏选择文件->打开文件或项目->选中CMakeLists.txt->打开**
 **选中Minimum Size Release 并配置编译过后文件的保存路径**
 **这部分略～**
 
-# 4. 修复为知笔记无法切换中文输入法的问题
+# 修复为知笔记无法切换中文输入法的问题
 
 **经过上面的步骤编译好为知笔记的客户端之后你会发现虽然能正常登录和同步文章，但是在新建文章中切换中文输入法输入中文是无效的，下面介绍如何解决这个问题。**
 
-## 4.1. 关于原因
+## 关于原因
 
 > 网上给的说法是由于Qt5的兼容性问题导致为知笔记使用fcitx输入法录入汉字会有问题，解决办法是自己编译fcitx-qt5，安装部署 libfcitxplatforminputcontextplugin.so即可。
 
-## 4.2. 安装 fcitx-libs-dev
+## 安装 fcitx-libs-dev
 
 ```shell
 sudo apt-get install fcitx-libs-dev
 ```
 
-## 4.3. 设置qmake环境变量
+## 设置qmake环境变量
 
 > 找到你电脑上qmake的路径，我的是/home/xavier/Qt5.7.0/5.7/gcc_64/bin/
 
@@ -103,13 +103,13 @@ sudo apt-get install fcitx-libs-dev
 export PATH="/home/xavier/Qt5.7.0/5.7/gcc_64/bin/":$PATH
 ```
 
-## 4.4. 下载fcitx-libs源码
+## 下载fcitx-libs源码
 
 ```shell
 git clone https://github.com/fcitx/fcitx-qt5.git
 ```
 
-## 4.5. 编译
+## 编译
 
 > 进入fcitx-qt5目录执行cmake来生成Makefile文件,使用-D参数指定Qt5_DIR路径
 
@@ -124,9 +124,9 @@ sudo make install
 
 > 将编译好的libfcitxplatforminputcontextplugin.so文件copy到/home/eason/Qt5.7.0/Tools/QtCreator/lib/Qt/plugins/platforminputcontexts目录。 重启系统。
 
-## 4.6. 问题汇总
+## 问题汇总
 
-### 4.6.1. 问题1
+### 问题1
 
 ```shell
 xavier@newgr8player:~/fcitx-qt5$ cmake .
@@ -164,7 +164,7 @@ cmake -D Qt5_DIR=/home/xavier/Qt5.7.0/5.7/gcc_64/lib/cmake/Qt5 .
 sudo make install
 ```
 
-### 4.6.2. 问题2
+### 问题2
 
 ```shell
 cmake -D Qt5_DIR=/home/xavier/Qt5.7.0/5.7/gcc_64/lib/cmake/Qt5 .

@@ -10,23 +10,23 @@ tags:
 description: 记录过程中出现的问题等
 ---
 
-# 1. 首先查看系统位数[后面选择JDK位数用]
+# 首先查看系统位数[后面选择JDK位数用]
 ```shell
 getconf LONG_BIT
 ```
 
-# 2. 官网选择你想要的JDK版本、Tomcat版本[本人用的是8.5]，然后对应系统位数下载
+# 官网选择你想要的JDK版本、Tomcat版本[本人用的是8.5]，然后对应系统位数下载
 ```shell
 wget [URL]
 ```
 
-# 3. 下载下来解压
+# 下载下来解压
 ```shell
 tar -zxvf  压缩文件名.tar.gz
 #解压后在当前目录，随便移动到哪里，一会配置会用到[推荐 /usr/local/ 别的目录至少当前用户要有访问权限]
 ```
 
-# 4. 配置JDK
+# 配置JDK
 >使用vi记事本 编辑 /etc/profile
 
 ```shell
@@ -48,7 +48,7 @@ export JAVA_HOME JAVA_BIN PATH CLASSPATH
 source /etc/profile
 ```
 
-> 5. 测试一下Java
+> 测试一下Java
 
 ```shell
 #查看版本
@@ -58,7 +58,7 @@ javac
 #如果不报错，那么就说明没问题了~
 ```
 
-# 6. 更改Tomcat端口
+# 更改Tomcat端口
 
 ```shell
 #进入Tomcat根目录
@@ -67,7 +67,7 @@ vi server.xml
 #使用命令 /8080 搜索一下 [Tomcat默认是 8080 端口]
 ```
 
-# 7. 开放端口
+# 开放端口
 
 ```shell
 #之前用惯了CentOS6 系列的Iptables，转到Ubuntu有点不适应，找到一个插件，先安装
@@ -80,19 +80,19 @@ iptables -A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
 /etc/init.d/iptables-persistent save
 ```
 
-# 8. 安装MySql数据库
+# 安装MySql数据库
 ```shell
 apt-get install mysql-server-5.6 mysql-client-core-5.6
 ```
 
-# 9. 新建远程用户并授权
+# 新建远程用户并授权
 ```shell
 create user username identified by password;
 #授权
 GRANT privileges ON databasename.tablename TO 'username'@'host' [WITH GRANT OPTION];
 ```
 
-# 10. 远程无法登陆
+# 远程无法登陆
 ```shell
 #出现远程无法登陆问题，有两个原因：
 #1. 绑定了 127.0.0.1 不允许远程访问
