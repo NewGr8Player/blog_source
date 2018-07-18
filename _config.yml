@@ -79,5 +79,7 @@ theme: material
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repository: git@github.com:NewGr8Player/NewGr8Player.github.io.git
+  repository: 
+    github: git@github.com:NewGr8Player/NewGr8Player.github.io.git
+    gitee: git@gitee.com:NewGr8Player/NewGr8Player.git
   branch: master
