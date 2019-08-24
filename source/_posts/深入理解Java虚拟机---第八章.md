@@ -1,19 +1,20 @@
 ---
 title: 深入理解Java虚拟机 - 第八章
-date: 2018-07-18 18:02:43
-categories: "JVM"
+categories: 分类
 tags:
-     - JVM
-     - 读书笔记
+  - 标签
 description: 深入理解Java虚拟机 - 第八章 虚拟机字节码执行引擎
+toc: true
+date: 2018-07-18 18:02:43
 ---
+
 ## 第八章 虚拟机字节码执行引擎
 ### 概述
 **执行引擎**是Java虚拟机最核心的组成之一。
 ### 运行时栈帧结构
 **栈帧（Stack Frame）**是用于支持方法调用和方法执行的数据结构。它是虚拟机运行时数据区中的虚拟机栈的栈元素，存储了方法的局部变量表、操作数栈、动态链接和方法返回地址等信息。每一个方法从调用开始到执行完成的过程，就对应着一个栈帧在虚拟机栈里面从入栈道出栈的过程。
 栈帧的概念结构图：
-![栈帧的概念结构](http://p62t2zg97.bkt.clouddn.com/img/栈帧的概念结构.jpg)
+![栈帧的概念结构.jpg](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/3c6a3190-c695-11e9-a6ef-abdd4d48672e.jpg)
 #### 局部变量表
 局部变量表是一组变量值存储空间，用于存放方法的参数和方法类定义的局部变量。
 它是以变量槽（Variable Slot）为最小单位，每一个Slot（32位）都应该能放一个 boolean 、byte 、char 、float 、 reference 、 short 、 int 或 returnAddress 类型数据。而至于 long 、double 两种数据则被规定为是64位数据（连续两个32位）。
@@ -23,7 +24,7 @@ description: 深入理解Java虚拟机 - 第八章 虚拟机字节码执行引�
 
 操作数栈的最大深度也在编译的时候就被写入到code属性的 ```max_stacks``` 数据项之中。
 在概念模型中，两个栈帧相互之间是完全独立的，但是大多数虚拟机会做一些优化处理，令两个栈帧出现一部分重叠，这样在方法调用时就可以公用一部分数据，无须进行额外的参数复制传递的操作。如下图示：
-![两个栈帧之间的共享数据.](http://p62t2zg97.bkt.clouddn.com/img/两个栈帧之间的共享数据.png)
+![两个栈帧之间的共享数据.png](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/25822130-c696-11e9-a6ef-abdd4d48672e.png)
 #### 动态连接
 每个栈帧都包含一个运行时常量池中指向该栈帧所属方法的引用，这是为了支持方法调用过程中的**动态连接**。
 #### 方法返回地址
