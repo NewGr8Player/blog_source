@@ -1,10 +1,11 @@
 ---
 title: Vue环境配置
 date: 2018-03-26 10:25:48
-categories: "VUE"
+categories: VUE
 tags:
      - VUE
 description: Vue环境配置
+toc: true
 ---
 # 环境安装配置
 
@@ -73,4 +74,4 @@ npm run build
 > 运行成功可能调用浏览器或者在浏览器中输入**http://localhost:8080**访问项目。
 
 **效果图如下**
-![](http://p62t2zg97.bkt.clouddn.com/20180326101815082/VUE配置成功后浏览器截图.png)
+![VUE配置成功后浏览器截图.png](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/2a2d5920-c6eb-11e9-bc99-47b0880b5ecf.png)

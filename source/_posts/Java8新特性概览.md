@@ -1,11 +1,13 @@
 ---
 title: Java8新特性概览
-date: 2018-09-14 11:04:06
 categories: "Java"
 tags:
-     - Java
+  - Java
 description: Java8新特性简单介绍
+toc: true
+date: 2018-09-14 11:04:06
 ---
+
 # 接口的默认实现
 Java8允许我们通过使用`default`关键字在接口中添加一个非抽象方法。
 ```Java

@@ -1,8 +1,8 @@
 ---
 title: Vue简单入门
-categories: 分类
+categories: VUE
 tags:
-  - 标签
+  - VUE
 description: Vue简单入门
 toc: false
 date: 2018-03-26 10:30:48

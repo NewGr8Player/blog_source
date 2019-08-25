@@ -1,8 +1,9 @@
 ---
 title: 深入理解Java虚拟机 - 第八章
-categories: 分类
+categories: "Java"
 tags:
-  - 标签
+  - Java
+  - JVM
 description: 深入理解Java虚拟机 - 第八章 虚拟机字节码执行引擎
 toc: true
 date: 2018-07-18 18:02:43

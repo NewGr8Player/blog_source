@@ -1,10 +1,11 @@
 ---
 title: 深入理解Java虚拟机 - 第二章
-categories: 分类
+categories: "Java"
 tags:
-  - 标签
+  - Java
+  - JVM
 description: 深入理解Java虚拟机 - 第二章 Java内存区域、内存溢出异常
-toc: false
+toc: true
 date: 2018-07-17 16:22:49
 ---
 

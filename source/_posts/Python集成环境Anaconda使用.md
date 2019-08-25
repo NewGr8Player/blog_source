@@ -1,10 +1,10 @@
 ---
 title: Python集成环境Anaconda使用
-categories: 分类
+categories: python
 tags:
-  - 标签
+  - python
 description: Python集成环境Anaconda使用
-toc: false
+toc: true
 date: 2018-03-24 16:00:28
 ---
 
