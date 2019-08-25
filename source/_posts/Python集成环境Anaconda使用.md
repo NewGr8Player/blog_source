@@ -1,12 +1,13 @@
 ---
 title: Python集成环境Anaconda使用
-date: 2018-03-24 16:00:28
-categories: "Python"
+categories: 分类
 tags:
-     - Python
-     - Anaconda
+  - 标签
 description: Python集成环境Anaconda使用
+toc: false
+date: 2018-03-24 16:00:28
 ---
+
 # 1. 安装
 **下载地址**
 [Anaconda镜像链接-清华大学开源镜像站](https://mirrors.tuna.tsinghua.edu.cn/)
@@ -31,7 +32,8 @@ conda info --envs
 conda info -e
 ```
 **显示如下图**
-![](http://p62t2zg97.bkt.clouddn.com/Anaconda%E5%9C%A8win%E4%B8%8B%E6%95%88%E6%9E%9C.png)
+![Anaconda在win下效果.png](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/1e383dc0-c6ea-11e9-ad5a-c9a6da72bdb3.png)
+
 ***显示当前存在的python环境，带有星号的 表示是当前活动的环境。可以发现环境的名称是以envs目录下文件夹名字命名的***
 
 ## 3.2. 创建环境

@@ -1,12 +1,13 @@
 ---
 title: 深入理解Java虚拟机 - 第二章
-date: 2018-07-17 16:22:49
-categories: "JVM"
+categories: 分类
 tags:
-     - JVM
-     - 读书笔记
+  - 标签
 description: 深入理解Java虚拟机 - 第二章 Java内存区域、内存溢出异常
+toc: false
+date: 2018-07-17 16:22:49
 ---
+
 ## 第二章 Java内存区域、内存溢出异常
 
 ### 概述
@@ -15,7 +16,7 @@ Java与C++之间有一堵由**内存分配**和**垃圾收集**技术所围成�
 
 ### Java运行时数据区
 
-![Java运行时数据区](http://p62t2zg97.bkt.clouddn.com/20180717162204553/Java runtime data area.png)
+![Java运行时数据区](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/4846a620-c6e9-11e9-ad5a-c9a6da72bdb3.png)
 
 #### 程序计数器
 
@@ -30,7 +31,7 @@ Java与C++之间有一堵由**内存分配**和**垃圾收集**技术所围成�
 
 #### 虚拟机栈
 
-**Java虚拟机栈（Java Virtual Machine Stack）**也是线程私有的，它的生命周期与线程相同。它描述的是Java方法执行的内存模型：每个方法执行的时候都会同时创建一个栈帧（Stack Frame）用于存储局部变量、操作栈、动态链接、方法出口等信息。    
+**Java虚拟机栈（Java Virtual Machine Stack）** 也是线程私有的，它的生命周期与线程相同。它描述的是Java方法执行的内存模型：每个方法执行的时候都会同时创建一个栈帧（Stack Frame）用于存储局部变量、操作栈、动态链接、方法出口等信息。    
 *每一个方法被调用直至执行完成的过程，就对应着一个栈帧从虚拟机栈中从入栈到出栈的过程。*        
 有人把Java内存区分为栈（Stack）和堆（Heap），这是比较粗糙的。实际上，这里的“栈”指的就是现在的这个虚拟机栈，或者确切点说，是虚拟机栈中的局部变量表部分。    
 局部变量表中存放了编译期可知的基本数据类型（boolean、byte、char、short、int、float、long、double）、对象引用（refrence类型，可能是一个对象起始地址的应用指针、也可能是一个代表对象的句柄或者其它与此对象相关的地址）和returnAddress（指向了一条字节码指令的地址）。   
@@ -39,23 +40,23 @@ Java与C++之间有一堵由**内存分配**和**垃圾收集**技术所围成�
 
 #### 本地方法栈
 
-**本地方法栈（Native Method Stack）**与虚拟机栈的作用非常相似，只不过虚拟机栈是为虚拟机执行字节码（Java方法）服务，而本地方法栈是用来服务于虚拟机使用的Native方法服务。    
+**本地方法栈（Native Method Stack）** 与虚拟机栈的作用非常相似，只不过虚拟机栈是为虚拟机执行字节码（Java方法）服务，而本地方法栈是用来服务于虚拟机使用的Native方法服务。    
 具体的虚拟机可以自由实现它，甚至可以把它和虚拟机栈合二为一（譬如Sun HotSpot 虚拟机）。    
 与虚拟机栈一样，本地方法栈也会抛出StackOverflowError和OutOfMemoryErroe异常。    
 
 #### Java堆
 
-**Java堆（Java Heap）**是Java虚拟机所管理的内存中最大的一块。是被所有的线程共享的一块内存区域，在虚拟机启动时创建。
+**Java堆（Java Heap）** 是Java虚拟机所管理的内存中最大的一块。是被所有的线程共享的一块内存区域，在虚拟机启动时创建。
 
 此内存区域的唯一目的就是存放对象实例，几乎所有的对象实例都在此分配内存。由于JIT编译器的发展与逃逸分析技术的发展，栈上分配、标量替换优化技术的进步，所有的对象实例都分配在堆上也不是那么绝对了。 
    
-*Java堆是垃圾收集器管理的主要区域*，因此也被称为“GC堆”（Garbage Collection Heap）。现在的收集器都是采用分代收集算法，所以Java堆中可以细分为：新生代和老生代。
+*Java堆是垃圾收集器管理的主要区域* ，因此也被称为“GC堆”（Garbage Collection Heap）。现在的收集器都是采用分代收集算法，所以Java堆中可以细分为：新生代和老生代。
 
 根据Java虚拟机规范，Java堆可以是处于物理上不连续的内存空间中，只要逻辑上连续即可。在实现上可以是固定大小，也可以是可扩展的，主流的是可扩展方式。
 
 ### 方法区
 
-**方法区（Method Area）**与Java堆一样，都是各个线程共享的内存区域，它用于存储已被虚拟机加载的类信息、常量、静态常量、即时编译器编译后的代码等数据。
+**方法区（Method Area）** 与Java堆一样，都是各个线程共享的内存区域，它用于存储已被虚拟机加载的类信息、常量、静态常量、即时编译器编译后的代码等数据。
 
 Java虚拟机规范对这个区域的限制非常松，除了和Java堆一样不需要连续的内存空间和可以选择固定大小或者可扩展外，还可以选择不实现垃圾收集。
 
@@ -71,7 +72,7 @@ Java虚拟机规范对这个区域的限制非常松，除了和Java堆一样不
 
 ### 直接内存
 
-**直接内存（Direct Memory）**并不是虚拟机运行时数据区的一部分，也不是Java虚拟机规范中定义的内存区域，但是这部分内存也被频繁地使用，而且有可能导致OutOfMemoryError异常。
+**直接内存（Direct Memory）** 并不是虚拟机运行时数据区的一部分，也不是Java虚拟机规范中定义的内存区域，但是这部分内存也被频繁地使用，而且有可能导致OutOfMemoryError异常。
 
 在JDK1.4种新加入了NIO（New Iuput/Output）类，引入了一种基于通道（Channel）与缓冲区（Buffer）的I/O方式，它可以使用Native函数直接分配堆外内存，然后通过一个存储在Java堆里面的DirectByteBuffer对象作为这快内存的引用进行操作。这样能在一些场景中显著提高性能，因为避免了在Java堆和Native堆中来回复制数据。
 
@@ -95,11 +96,11 @@ Java虚拟机规范对这个区域的限制非常松，除了和Java堆一样不
 
 - **句柄方式**，Java堆中将会划分出一块内存作为句柄池，reference中存储的就是对象的句柄地址，而句柄中包含了对象实例数据和类型数据各自的具体地址信息，如下图：
 
-![句柄方式访问对象](http://p62t2zg97.bkt.clouddn.com/20180717162204553/access object by handle.jpg)
+![句柄方式访问对象.png](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/d5334f20-c6e9-11e9-ad5a-c9a6da72bdb3.png)
 
 - **指针方式**，reference变量中直接存储的就是对象的地址，而Java堆对象的布局中就必须考虑如何防止访问类型数据的相关信息，如下图：
 
-![指针方式访问对象](http://p62t2zg97.bkt.clouddn.com/20180717162204553/access object by pointer.jpg)
+![指针方式访问对象.png](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/e4717070-c6e9-11e9-ad5a-c9a6da72bdb3.png)
   
 这两种对象的访问方式各有优势：    
 

@@ -1,12 +1,13 @@
 ---
 title: 深入理解Java虚拟机 - 第五章
-date: 2018-07-18 08:45:26
-categories: "JVM"
+categories: 分类
 tags:
-     - JVM
-     - 读书笔记
+  - 标签
 description: 深入理解Java虚拟机 - 第五章
+toc: false
+date: 2018-07-18 08:45:26
 ---
+
 # 第五章 调优案例分析与实战
 ## 案例分析
 ### 高性能硬件上的程序部署策略  
@@ -40,7 +41,7 @@ description: 深入理解Java虚拟机 - 第五章
 - 一个学校的小型项目，基于B/S的电子考试系统，服务器是Jetty 7.1.4，硬件是一台普通PC机，Core i5 CPU，4GB内存，运行32位Windows操作系统；
 - 为了实现客户端能实时地从服务器端接收考试数据，使用了逆向AJAX技术（也称为Comet或Server Side Push），选用CometD 1.1.1作为服务端推送框架；
 - 测试期间发现服务端不定期抛出内存溢出；加入-XX:+HeapDumpOnOutOfMemoryError后抛出内存溢出时什么问题都没有，采用jstat观察GC并不频繁且GC回收正常；最后在内存溢出后从系统日志发现如下异常堆栈：
-![](http://p62t2zg97.bkt.clouddn.com/深入理解Java虚拟机---第五章/example_direct_memory_error.png)
+![example_direct_memory_error.png](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/5d8fb3e0-c6e5-11e9-ad5a-c9a6da72bdb3.png)
 **问题分析**
 - 在第二章里曾经说过直接内存溢出的场景，垃圾收集时，虚拟机虽然会对直接内存进行回收，但它只能等老年代满了触发Full GC时顺便清理，否则只能等内存溢出时catch住然后调用System.gc()，如果虚拟机还是不听（比如打开了-XX:+DisableExplictGC）则只能看着堆中还有许多空闲内存而溢出；
 - 本案例中的CometD框架正好有大量的NIO操作需要使用直接内存；
@@ -57,7 +58,7 @@ description: 深入理解Java虚拟机 - 第五章
 **问题描述**
 - 一个基于B/S的MIS系统，硬件为两台2个CPU、8GB内存的HP系统，服务器是WebLogic 9.2（和案例”集群间同步导致的内存溢出”相同的系统）；
 - 正常运行一段时间后发现运行期间频繁出现集群节点的虚拟机进程自动关闭的现象，留下一个hs\_err\_pid###.log，奔溃前不久都发生大量相同的异常，日志如下所示：
-![](http://p62t2zg97.bkt.clouddn.com/深入理解Java虚拟机---第五章/example_jvm_coredown.png)
+![example_jvm_coredown.png](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/6788a690-c6e5-11e9-ad5a-c9a6da72bdb3.png)
 **问题分析**
 - 这是一个远端断开连接的异常，得知在MIS系统工作流的待办事项变化时需要通过Web服务通知OA门户系统；
 - 通过SoapUI测试发现调用后竟然需要长达3分钟才能返回，并且返回结果都是连接中断；
@@ -67,8 +68,10 @@ description: 深入理解Java虚拟机 - 第五章
 **问题描述**
 - 有一个后台RPC服务器，使用64位虚拟机，内存配置为-Xms4g -Xmx8g -Xmn1g，使用ParNew + CMS的收集器组合；
 - 平时Minor GC时间约在20毫秒内，但业务需要每10分钟加载一个约80MB的数据文件到内存进行数据分析，这些数据会在内存中形成超过100万个HashMap Entry，在这段时间里Minor GC会超过500毫秒，这个时间过长，GC日志如下：
-![](http://p62t2zg97.bkt.clouddn.com/深入理解Java虚拟机---第五章/example_incorr_collection1.png)
-![](http://p62t2zg97.bkt.clouddn.com/深入理解Java虚拟机---第五章/example_incorr_collection2.png)
+
+![example_incorr_collection1.png](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/70d49060-c6e5-11e9-ad5a-c9a6da72bdb3.png)
+![example_incorr_collection2.png](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/70d3a600-c6e5-11e9-ad5a-c9a6da72bdb3.png)
+
 **问题分析**
 - 在分析数据文件期间，800M的Eden空间在Minor GC后对象还是存活的，而ParNew垃圾收集器使用的是复制算法，把这些对象复制到Survivor并维持这些对象引用成为沉重的负担，导致GC时间变长；
 - 从GC可以将Survivor空间去掉（加入参数-XX:SurvivorRatio=65536、-XX:MaxTenuringThreshold=0或者-XX:AlwaysTenure），让新生代存活的对象第一次Minor GC后立即进入老年代，等到Major GC再清理。这种方式可以治标，但也有很大的副作用。
@@ -80,7 +83,7 @@ description: 深入理解Java虚拟机 - 第五章
 - 另外观察到GUI程序最小化时，资源管理中显示的占用内存大幅减小，但虚拟内存没变化；
 - 因为是桌面程序，所需内存不大（-Xmx256m），加入参数-XX:+PrintGCApplicationStoppedTime -XX：PrintGCDateStamps -Xloggc:gclog.log后，从日志文件确认是GC导致的，大部分的GC时间在100ms以内，但偶尔会出现一次接近1min的GC；
 - 加入参数-XX：PrintReferenceGC参数查看GC的具体日志信息，发现执行GC动作的时间并不长，但从准备开始GC到真正GC直接却消耗了大部分时间，如下所示：
-![](http://p62t2zg97.bkt.clouddn.com/深入理解Java虚拟机---第五章/example_virtual_memory.png)  
+![example_virtual_memory.png](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/7b018b60-c6e5-11e9-ad5a-c9a6da72bdb3.png) 
 **问题分析**
 - 初步怀疑是最小化时工作内存被自动交换到磁盘的页面文件中，这样发生GC时就有可能因为恢复页面文件的操作而导致不正常的GC停顿；
 - 在MSDN查证确认了这种猜想，加入参数-Dsun.awt.keepWorkingSetOnMinimize=true来解决；这个参数在很多AWT程序如VisualVM都有应用。
@@ -93,4 +96,4 @@ description: 深入理解Java虚拟机 - 第五章
 - 增加参数-XX：DisableExplicitGC屏蔽掉显式GC触发；
 - 采用ParNew+CMS的垃圾收集器组合；
 - 最终从Eclipse启动耗时15秒到7秒左右， eclipse.ini配置如下：
-![](http://p62t2zg97.bkt.clouddn.com/深入理解Java虚拟机---第五章/example_eclipse.png)
+![5376408f7d137ff833df991.png](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/beeb8fb0-c6e5-11e9-ad5a-c9a6da72bdb3.png)

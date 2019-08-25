@@ -1,11 +1,13 @@
 ---
 title: Vue简单入门
-date: 2018-03-26 10:30:48
-categories: "VUE"
+categories: 分类
 tags:
-     - VUE
+  - 标签
 description: Vue简单入门
+toc: false
+date: 2018-03-26 10:30:48
 ---
+
 # 基本结构
 
 + template
@@ -58,7 +60,7 @@ new Vue({
 
 ## 数据渲染
 
-**v-text** && **v-html** && ** \{\{ 变量 \}\} **
+**v-text** && **v-html** && **{{ 变量 }}**
 ```html
 <p>{{ a }}</p>
 <p v-text="a"></p>

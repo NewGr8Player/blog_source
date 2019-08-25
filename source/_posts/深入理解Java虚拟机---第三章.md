@@ -1,12 +1,13 @@
 ---
 title: 深入理解Java虚拟机 - 第三章
-date: 2018-07-17 16:43:22
-categories: "JVM"
+categories: 分类
 tags:
-     - JVM
-     - 读书笔记
+  - 标签
 description: 深入理解Java虚拟机 - 第三章 垃圾收集器与内存分配策略
+toc: false
+date: 2018-07-17 16:43:22
 ---
+
 ## 第三章 垃圾收集器与内存分配策略
 
 ### 概述
@@ -30,7 +31,7 @@ description: 深入理解Java虚拟机 - 第三章 垃圾收集器与内存分�
 这个算法的基本思路是：通过一系列的名字为“GC Roots”的对象作为起点，从这些节点开始向下搜索，搜索所走过的路径称为**引用链（Reference Chain）**，当一个对象到GC Roots没有任何引用链对象相连（用图论的话说，就是从GC Roots到这个对象不可到达）时，则证明此对象不可用。    
 如下图示：    
        
-![GC Roots Tracing](http://p62t2zg97.bkt.clouddn.com/20180717164322/GC Root Tracing.jpg)  
+![887319799315780bfe0ca238f6d9bb11.jpg](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/fe037d10-c6e6-11e9-ad5a-c9a6da72bdb3.jpg)
     
 - 对象object5、object6和object7虽然互相关联，但是他们到GC Roots是不可到达的，所以它们会被判定为师可回收对象。
 在Java中，可以作为GC Roots的对象有以下几种：    
@@ -74,7 +75,7 @@ Java虚拟机规范不要求虚拟机在方法区实现垃圾收集，而且在�
 - 加载该类的ClassLoader已经被回收
 - 该类对应的 ```java.lang.class``` 对象没有在任何地方被引用，无法在任何地方通过反射访问该类的方法
 
-虚拟机在一个类同时满足以上三个条件时，**可以**对这个无用类进行回收。（⚠️，这里说的仅仅是“**可以**”，而不是和对象一样，不使用了就必然会回收）。HotSpot虚拟机提供了 ```-Xnoclassgc``` 参数来进行控制，还可以使用 ```-verbose:class``` , ```-XX:+TraceClassLoading``` , ```-XX:+TraceClassUnLoading``` 查看类的加载和卸载信息。
+虚拟机在一个类同时满足以上三个条件时，**可以**对这个无用类进行回收。（ 这里说的仅仅是“**可以**”，而不是和对象一样，不使用了就必然会回收）。HotSpot虚拟机提供了 ```-Xnoclassgc``` 参数来进行控制，还可以使用 ```-verbose:class``` , ```-XX:+TraceClassLoading``` , ```-XX:+TraceClassUnLoading``` 查看类的加载和卸载信息。
 
 在大量使用反射、动态代理、CGLib等bytecode框架的场景，以及动态生成JSP和OSGi这类频繁自定义ClassLoader的场景都需要虚拟机具备类卸载的功能，以保证永久代不会溢出。
 
@@ -108,7 +109,7 @@ HotSpot虚拟机默认的Eden和Survivor大小比例为8:1，也就是说每次�
 ## 垃圾收集器
 垃圾收集器是内存回收的具体实现，Java虚拟机规范对垃圾收集器的实现并没有具体规定，因此不同厂商、不同版本的虚拟机所提供的垃圾收集器可能会有很大的区别。    
 以下是 HotSpot JVM 1.6 的垃圾收集器：
-![HotSpot JVM 1.6 GC](http://p62t2zg97.bkt.clouddn.com/20180717164322/HotSpot JVM 1.6 GC .jpg)
+![106941420170722171749668485124534.png](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/1b4e32a0-c6e9-11e9-ad5a-c9a6da72bdb3.png)
 
 其中，如果两个收集器之间有连线，说明可以搭配使用。
 
@@ -209,5 +210,3 @@ Java 技术体系中的自动内存管理最终可以可以归结为自动化地
 
 ### 空间分配担保
 在发生Minor GC时，虚拟机会检测之前每次晋升到老年代的平均大小是否大于老年代的剩余空间大小，如果大于，则改为直接进行一次Full GC。如果小于，则查看HandlePromotionFailure设置是否允许担保失败；如果允许，那只会进行Minor GC；如果不允许，则也要改为进行一次Full GC。
-
- 
