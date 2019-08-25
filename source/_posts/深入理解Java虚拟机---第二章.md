@@ -4,6 +4,7 @@ categories: "Java"
 tags:
   - Java
   - JVM
+  - 笔记
 description: 深入理解Java虚拟机 - 第二章 Java内存区域、内存溢出异常
 toc: true
 date: 2018-07-17 16:22:49

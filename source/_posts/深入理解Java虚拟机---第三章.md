@@ -4,6 +4,7 @@ categories: "Java"
 tags:
   - Java
   - JVM
+  - 笔记
 description: 深入理解Java虚拟机 - 第三章 垃圾收集器与内存分配策略
 toc: true
 date: 2018-07-17 16:43:22

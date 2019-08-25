@@ -4,6 +4,7 @@ categories: "Java"
 tags:
   - Java
   - JVM
+  - 笔记
 description: 深入理解Java虚拟机 - 第五章
 toc: true
 date: 2018-07-18 08:45:26

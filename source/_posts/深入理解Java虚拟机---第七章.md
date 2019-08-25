@@ -4,6 +4,7 @@ categories: "Java"
 tags:
   - Java
   - JVM
+  - 笔记
 description: 深入理解Java虚拟机 - 第七章 虚拟机类的加载机制 虚拟机类的加载机制
 toc: true
 date: 2018-07-18 13:22:36

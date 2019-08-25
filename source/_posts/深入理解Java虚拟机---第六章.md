@@ -4,6 +4,7 @@ categories: "Java"
 tags:
   - Java
   - JVM
+  - 笔记
 description: 深入理解Java虚拟机 - 第六章 类文件结构
 toc: true
 date: 2018-07-18 08:59:28
