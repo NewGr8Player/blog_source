@@ -1,8 +1,9 @@
 ---
 title: Java String 源码分析
-categories: 分类
+categories: Java
 tags:
-  - 标签
+  - Java
+  - 源码
 description: Java8新特性简单介绍
 toc: true
 img: ''
@@ -15,8 +16,8 @@ updated: 2019-08-26 15:06:50
 
 # 定义
 ```Java
-public final class String
-    implements java.io.Serializable, Comparable<String>, CharSequence {}
+public final class String implements java.io.Serializable, Comparable<String>, CharSequence {}
+
 ```
 
 从定义可以看出
@@ -33,6 +34,7 @@ public final class String
 ```Java
 /** 用于存放字符串的数组 */
 private final char value[];
+
 ```
 
 > 由于被final修饰，故String对象一旦初始化后，其即为不可变（指其内容不能被修改，其引用还是可以指向其他的内容）。
@@ -49,6 +51,7 @@ private final char value[];
 public String() {
     this.value = "".value;
 }
+
 ```
 
 > 即 `String str = new String();` 时，变量`str`的值为空字符串。
@@ -59,6 +62,7 @@ public String(String original) {
     this.value = original.value;
     this.hash = original.hash;
 }
+
 ```
 
 > 这个方法会产生两个字符串对象，分别为参数`original`与新创建的字符串对象。
@@ -68,7 +72,10 @@ public String(String original) {
 public String(char value[]) {
     this.value = Arrays.copyOf(value, value.length);
 }
+
 ```
+
+**带有offset与count的重载**
 
 ```Java
 public String(char value[], int offset, int count) {
@@ -90,6 +97,7 @@ public String(char value[], int offset, int count) {
     }
     this.value = Arrays.copyOfRange(value, offset, offset+count);
 }
+
 ```
 
 ### 使用字节数组构造
@@ -97,6 +105,7 @@ public String(char value[], int offset, int count) {
 ```Java
 String(byte bytes[]);
 String(byte bytes[], int offset, int length);
+
 ```
 
 **需要制定字符集的构造方法**
@@ -106,6 +115,7 @@ String(byte bytes[], Charset charset);
 String(byte bytes[], String charsetName);
 String(byte bytes[], int offset, int length, Charset charset);
 String(byte bytes[], int offset, int length, String charsetName);
+
 ```
 
 ### 使用`StringBuffer`或者`StringBuider`构造
@@ -125,6 +135,7 @@ String(char[] value, boolean share) {
     // assert share : "unshared not supported";
     this.value = value;
 }
+
 ```
 
 > 这个方法由Java7提供，直接饮用value[]的地址，并且`share`只能为`true`
@@ -159,6 +170,7 @@ public boolean equals(Object anObject) {
     }
     return false;
 }
+
 ```
 
 > 一般默认是比较是否是同一个对象，此处默认重写，比较是否比较的是内容相同的两个字符串
@@ -181,6 +193,7 @@ public int hashCode() {
     }
     return h;
 }
+
 ```
 
 > 常规hashCode方法
@@ -203,6 +216,7 @@ public String substring(int beginIndex, int endIndex) {
     return ((beginIndex == 0) && (endIndex == value.length)) ? this
             : new String(value, beginIndex, subLen);
 }
+
 ```
 
 > Java 7 提供了一种新的实现方式牺牲一些性能，避免内存泄露。 Java 6 时，是同一个数组中操作。Java 7 是创建一个新的数组。
@@ -252,5 +266,6 @@ public String replace(char oldChar, char newChar) {
     }
     return this;
 }
+
 ```
 
