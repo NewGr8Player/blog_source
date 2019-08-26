@@ -1,11 +1,14 @@
 ---
 title: Java8新特性概览
-categories: "Java"
+categories: 分类
 tags:
-  - Java
+  - 标签
 description: Java8新特性简单介绍
 toc: true
 date: 2018-09-14 11:04:06
+updated: 2019-08-26 10:52:26
+img:
+author:
 ---
 
 # 接口的默认实现
@@ -199,7 +202,7 @@ class Lambda4 {
 ```
 
 ## 访问接口的默认实现方法
-在之前提到的`Formula`接口中声明的被`default`修饰的的`sqrt`方法可以被任意的for木旯示例包括匿名对象访问。但是对于lambda表达式则不可以。
+在之前提到的`Formula`接口中声明的被`default`修饰的的`sqrt`方法可以直接使用。但是对于lambda表达式则不可以。
 
 默认方法在lambda作用域中**不能被访问**，以下代码不能正常运行。
 ```Java
