@@ -10,7 +10,6 @@ toc: true
 author: NewGr8Player
 date: 2019-08-27 09:05:15
 updated: 2019-09-05 10:10:50
-img:
 ---
 
 # 基础与常识
