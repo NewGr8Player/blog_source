@@ -7,19 +7,13 @@
 <script src="https://cdn.bootcss.com/blueimp-md5/2.10.0/js/md5.js"></script>
 
 <script>
-    var id = location.pathname;
-    if ('<%=  page.gitalk =="md5" ?"true":"false" %>' === 'true') {
-        id = md5(location.pathname)
-    } else if ('<%= page.gitalk =="plaintext"?"true":"false" %>' === 'true') {
-        id = location.pathname;
-    }
     var gitalk = new Gitalk({
         clientID: '<%= theme.comment.gitalk_client_id %>',
         clientSecret: '<%= theme.comment.gitalk_client_secret %>',
         repo: '<%= theme.comment.gitalk_repo %>',
         owner: '<%= theme.comment.gitalk_owner %>',
         admin: ['<%= theme.comment.gitalk_owner %>'],
-        id: id,
+        id: md5(location.pathname),
         distractionFreeMode: false
     })
     gitalk.render('gitalk-container')
