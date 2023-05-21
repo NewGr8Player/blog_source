@@ -1,0 +1,101 @@
+---
+title: 深入理解Java虚拟机 - 第五章
+categories: "Java"
+tags:
+  - Java
+  - JVM
+  - 笔记
+description: 深入理解Java虚拟机 - 第五章
+toc: true
+date: 2018-07-18 08:45:26
+---
+
+# 第五章 调优案例分析与实战
+## 案例分析
+### 高性能硬件上的程序部署策略  
+**问题描述**
+- 一个每天15万PV左右的在线文档网站升级了硬件，4个CPU，16GB物理内存，操作系统为64位CentOS 5.4，使用Resin作为Web服务器，没有部署其他的应用。
+- 管理员选用了64位的JDK 1.5，并通过-Xmx和-Xms参数将Java堆固定在12GB。
+- 使用一段时间不定期出现长时间失去响应的情况；
+**问题分析**
+- 升级前使用32位系统，Java堆设置为1.5GB，只是感觉运行缓慢没有明显的卡顿；
+- 通过监控发现是由于GC停顿导致的，虚拟机运行在Server模式，默认使用吞吐量优先收集器，回收12GB的堆，一次Full GC的停顿时间高达14秒；
+- 并且由于程序设计的原因，很多文档从磁盘加载到内存中，导致内存中出现很多由文档序列化生成的大对象，这些大对象进入了老年代，没有在Minor GC中清理掉；
+**解决办法**
+- 在虚拟机上建立5个32位的JDK逻辑集群，每个进程按2GB内存计算（其中堆固定为1.5GB），另外建议一个Apache服务作为前端均衡代理访问门户；
+- 另外考虑服务压力主要在磁盘和内存访问，CPU资源敏感度较低，因此改为CMS收集器；
+- 最终服务没有再出现长时间停顿，速度比硬件升级前有较大提升；
+### 集群间同步导致的内存溢出
+**问题描述**
+- 一个基于B/S的MIS系统，硬件为两台2个CPU、8GB内存的HP小型机，服务器为WebLogic 9.2，每台机器启动了3个WebLogic实例，构建一个6台节点的亲和式集群（一个固定的用户请求永远分配到固定的节点处理）。
+- 由于有部分数据需要共享，原先采用数据库，后因为读写性能问题使用了JBossCache构建了一个全局缓存；
+- 正常使用一段较长的时间，最近不定期出现了多次的内存溢出问题；
+**问题分析**
+- 监控发现，服务内存回收状况一直正常，每次内存回收后都能恢复到一个稳定的可用空间
+- 此次未升级业务代码，排除新修改代码引入的内存泄漏问题；
+- 服务增加-XX:+HeapDumpOnOutOfMemoryError参数，在最近一次内存溢出时，分析heapdump文件发现存在大量的org.jgroups.protocols.pbcast,NAKACK对象；
+- 最终分析发现是由于JBossCache的NAKACK栈在页面产生大量请求时，有个负责安全校验的全局Filter导致集群各个节点之间网络交互非常频繁，当网络情况不能满足传输要求时，大量的需要失败重发的数据在内存中不断堆积导致内存溢出。
+**解决办法**
+*   JBossCache版本改进；
+*   程序设计优化，JBossCahce集群缓存同步，不大适合有频繁写操作的情况；
+### 堆外内存导致的溢出错误
+**问题描述**
+- 一个学校的小型项目，基于B/S的电子考试系统，服务器是Jetty 7.1.4，硬件是一台普通PC机，Core i5 CPU，4GB内存，运行32位Windows操作系统；
+- 为了实现客户端能实时地从服务器端接收考试数据，使用了逆向AJAX技术（也称为Comet或Server Side Push），选用CometD 1.1.1作为服务端推送框架；
+- 测试期间发现服务端不定期抛出内存溢出；加入-XX:+HeapDumpOnOutOfMemoryError后抛出内存溢出时什么问题都没有，采用jstat观察GC并不频繁且GC回收正常；最后在内存溢出后从系统日志发现如下异常堆栈：
+![example_direct_memory_error.png](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/5d8fb3e0-c6e5-11e9-ad5a-c9a6da72bdb3.png)
+**问题分析**
+- 在第二章里曾经说过直接内存溢出的场景，垃圾收集时，虚拟机虽然会对直接内存进行回收，但它只能等老年代满了触发Full GC时顺便清理，否则只能等内存溢出时catch住然后调用System.gc()，如果虚拟机还是不听（比如打开了-XX:+DisableExplictGC）则只能看着堆中还有许多空闲内存而溢出；
+- 本案例中的CometD框架正好有大量的NIO操作需要使用直接内存；
+### 外部命令导致系统缓慢
+**问题描述**
+- 一个数字校园应用系统，运行在一个4个CPU的Solaris 10操作系统上，中间件为GlassFish服务器；
+- 系统在做大并发压力测试时，发现请求响应时间比较慢，通过监控工具发现CPU使用率很高，并且系统占用绝大多数的CPU资源的程序并不是应用系统本身；
+- 通过Dtrace脚本发现最消耗CPU的竟然是fork系统调用（Linux用来产生新进程的）；
+**问题分析**
+- 最终发现是每个用户请求需要执行一个外部的shell脚本来获取一些系统信息，是通过Runtime.getRuntime().exec()方法调用的；
+- Java虚拟机在执行这个命令时先克隆一个和当前虚拟机拥有一样环境变量的进程，再用这个新进程去执行外部命令，如果频繁地执行这个操作，系统消耗会很大；
+- 最终修改时改用Java的API去获取这些信息，系统恢复了正常；
+### 服务器JVM进程奔溃
+**问题描述**
+- 一个基于B/S的MIS系统，硬件为两台2个CPU、8GB内存的HP系统，服务器是WebLogic 9.2（和案例”集群间同步导致的内存溢出”相同的系统）；
+- 正常运行一段时间后发现运行期间频繁出现集群节点的虚拟机进程自动关闭的现象，留下一个hs\_err\_pid###.log，奔溃前不久都发生大量相同的异常，日志如下所示：
+![example_jvm_coredown.png](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/6788a690-c6e5-11e9-ad5a-c9a6da72bdb3.png)
+**问题分析**
+- 这是一个远端断开连接的异常，得知在MIS系统工作流的待办事项变化时需要通过Web服务通知OA门户系统；
+- 通过SoapUI测试发现调用后竟然需要长达3分钟才能返回，并且返回结果都是连接中断；
+- 由于MIS使用异步方式调用，两边处理速度不对等，导致在等待的线程和Socket连接越来越多，最终在超过虚拟机承受能力后进场奔溃；
+- 解决方法：将异步调用修改为生产者/消费者模型的消息队列处理，系统恢复正常；
+### 不恰当数据结构导致内存占用过大
+**问题描述**
+- 有一个后台RPC服务器，使用64位虚拟机，内存配置为-Xms4g -Xmx8g -Xmn1g，使用ParNew + CMS的收集器组合；
+- 平时Minor GC时间约在20毫秒内，但业务需要每10分钟加载一个约80MB的数据文件到内存进行数据分析，这些数据会在内存中形成超过100万个HashMap Entry，在这段时间里Minor GC会超过500毫秒，这个时间过长，GC日志如下：
+
+![example_incorr_collection1.png](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/70d49060-c6e5-11e9-ad5a-c9a6da72bdb3.png)
+![example_incorr_collection2.png](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/70d3a600-c6e5-11e9-ad5a-c9a6da72bdb3.png)
+
+**问题分析**
+- 在分析数据文件期间，800M的Eden空间在Minor GC后对象还是存活的，而ParNew垃圾收集器使用的是复制算法，把这些对象复制到Survivor并维持这些对象引用成为沉重的负担，导致GC时间变长；
+- 从GC可以将Survivor空间去掉（加入参数-XX:SurvivorRatio=65536、-XX:MaxTenuringThreshold=0或者-XX:AlwaysTenure），让新生代存活的对象第一次Minor GC后立即进入老年代，等到Major GC再清理。这种方式可以治标，但也有很大的副作用。
+- 另外一种是从程序设计的角度看，HashMap结构中，只有key和value所存放的两个长整形数据是有效数据，共16B（2 * 8B），而实际耗费的内存位88B（长整形包装为Long对象需要多8B的MarkWord、8B的Klass指针，Map.Entry多了16B的对象头、8B的next字段和4B的int型hash字段、为对齐添加的4B空白填充，另外还有8B的Entry引用），内存空间效率（18%）太低。
+### 由Windows虚拟内存导致的长时间停顿
+**问题描述**
+- 有一个带心跳检测功能的GUI桌面程序，每15秒发送一次心跳检查信号，如果对方30秒内都没有信信号返回，则认为和对方已断开连接；
+- 程序上线后发现有误报，查询日志发现误报是因为程序会偶尔出现间隔约1分钟左右的时间完全无日志输出，处于停顿状态；
+- 另外观察到GUI程序最小化时，资源管理中显示的占用内存大幅减小，但虚拟内存没变化；
+- 因为是桌面程序，所需内存不大（-Xmx256m），加入参数-XX:+PrintGCApplicationStoppedTime -XX：PrintGCDateStamps -Xloggc:gclog.log后，从日志文件确认是GC导致的，大部分的GC时间在100ms以内，但偶尔会出现一次接近1min的GC；
+- 加入参数-XX：PrintReferenceGC参数查看GC的具体日志信息，发现执行GC动作的时间并不长，但从准备开始GC到真正GC直接却消耗了大部分时间，如下所示：
+![example_virtual_memory.png](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/7b018b60-c6e5-11e9-ad5a-c9a6da72bdb3.png) 
+**问题分析**
+- 初步怀疑是最小化时工作内存被自动交换到磁盘的页面文件中，这样发生GC时就有可能因为恢复页面文件的操作而导致不正常的GC停顿；
+- 在MSDN查证确认了这种猜想，加入参数-Dsun.awt.keepWorkingSetOnMinimize=true来解决；这个参数在很多AWT程序如VisualVM都有应用。
+## 实战：Eclipse运行速度调优
+- 升级JDK；  
+- 设置-XX:MaxPermSize=256M解决Eclipse判断虚拟机版本的bug；
+- 加入参数-Xverfify:none禁止字节码验证；
+- 虚拟机运行在client模式，采用C1轻量级编译器；
+- 把-Xms和-XX：PermSize参数设置为-Xmx和-XX:MaxPermSize一样，这样强制虚拟机启动时把老年代和永久代的容量固定下来，避免运行时自动扩展；
+- 增加参数-XX：DisableExplicitGC屏蔽掉显式GC触发；
+- 采用ParNew+CMS的垃圾收集器组合；
+- 最终从Eclipse启动耗时15秒到7秒左右， eclipse.ini配置如下：
+![5376408f7d137ff833df991.png](https://newgr8player-blog.oss-cn-beijing.aliyuncs.com/hexo-client/2019/08/25/beeb8fb0-c6e5-11e9-ad5a-c9a6da72bdb3.png)
