@@ -9,3 +9,7 @@ hexo.extend.helper.register('jsLsload', function(){
 hexo.extend.helper.register('cssLsload', function(){
   return require("./lib/css_lsload.js").call(hexo,...arguments);
 });
+
+hexo.extend.helper.register('decodeURI', function(encodedURI) {
+  return decodeURI(encodedURI);
+});
